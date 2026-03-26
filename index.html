@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Onikinci Sancak</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* Hikaye (Giriş) Ekranı */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        #intro-box { background: #222; border: 2px solid red; padding: 20px; border-radius: 10px; max-width: 500px; text-align: left; box-shadow: 0 0 20px red; }
+        #intro-box h1 { color: red; text-align: center; margin-top: 0; }
+        #intro-box p { font-size: 15px; line-height: 1.5; color: #ddd; }
+        .start-btn { display: block; width: 100%; background: red; color: white; padding: 15px; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        .start-btn:hover { background: darkred; }
+
+        #header { background: #333; padding: 10px; border-bottom: 2px solid red; position: sticky; top: 0; z-index: 1000; }
+        .player-info { display: inline-block; margin: 2px 5px; padding: 5px 8px; border-radius: 5px; font-size: 11px; background: #222; border: 1px solid #444; }
+        .active-p { border: 2px solid #00ff00; background: #333; box-shadow: 0 0 10px #00ff00; transform: scale(1.05); }
+        
+        #game-container { position: relative; display: inline-block; width: 100%; max-width: 800px; margin-top: 10px; }
+        img { width: 100%; height: auto; display: block; border: 2px solid #444; }
+        
+        .pin { position: absolute; width: 26px; height: 26px; background: red; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid white; cursor: pointer; font-weight: bold; font-size: 10px; box-shadow: 0 0 8px black; transition: transform 0.2s; }
+        .pin:hover { transform: scale(1.2); }
+
+        #status-board { background: #222; padding: 10px; font-size: 10px; text-align: left; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; border-top: 1px solid red; }
+        .p-log { border: 1px solid #444; padding: 5px; min-height: 40px; }
+        
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; z-index: 2000; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
+        button.opt-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; border: 1px solid #ccc; background: #f0f0f0; }
+        
+        .winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #8B0000, #000000); color: white; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; text-align: center; padding: 20px; }
+        .winner-screen h1 { font-size: 40px; color: gold; text-shadow: 2px 2px 5px black; }
+        .winner-screen h2 { font-size: 25px; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+
+<div id="intro-screen">
+    <div id="intro-box">
+        <h1>ONİKİNCİ SANCAK</h1>
+        <p>Yıl 1919... Vatan toprakları işgal altında.</p>
+        <p>Halk umutsuz, ordular dağıtılmış. Karargâh seni ve diğer 3 komutanı Anadolu'ya gönderiyor.</p>
+        <p><b>Göreviniz:</b> Haritadaki 12 hedefi tayin edip şehirlere gitmek, halkın güvenini kazanıp istiklal ateşini yakmak. Doğru kararlar vererek <b>Tanınırlığını</b> artırmalısın. Eğer yanılırsan insanlar sana inanmaz ve onları ikna edene kadar o şehirden <b>geri çekilmek yok!</b></p>
+        <p>12 Sancağı ilk diken komutan vatanı kurtaracak.</p>
+        <button class="start-btn" onclick="oyunuBaslat()">HAREKÂTI BAŞLAT</button>
+    </div>
+</div>
+
+<div id="header">
+    <div id="p1-ui" class="player-info active-p">1. Komutan: <span id="p1-count">0</span>/12</div>
+    <div id="p2-ui" class="player-info">2. Komutan: <span id="p2-count">0</span>/12</div>
+    <div id="p3-ui" class="player-info">3. Komutan: <span id="p3-count">0</span>/12</div>
+    <div id="p4-ui" class="player-info">4. Komutan: <span id="p4-count">0</span>/12</div>
+    <div style="margin-top:8px; color:yellow; font-size: 13px;">Harekât Emri Bekleniyor: <b id="turn-name">1. Komutan</b></div>
+    <div style="margin-top:3px; font-size:11px; color:#aaa;">(Hedef Tayin Et)</div>
+</div>
+
+<div id="game-container">
+    <img src="https://i.ibb.co/B5cbNPX0/1774539657417.png">
+    <div class="pin" style="top: 15%; left: 5%;" onclick="hamleYap('Selanik')">S</div>
+    <div class="pin" style="top: 11%; left: 24%;" onclick="hamleYap('Trakya')">T</div>
+    <div class="pin" style="top: 12%; left: 34%;" onclick="hamleYap('İstanbul')">İ</div>
+    <div class="pin" style="top: 25%; left: 18%;" onclick="hamleYap('Çanakkale')">Ç</div>
+    <div class="pin" style="top: 55%; left: 21%;" onclick="hamleYap('İzmir')">İz</div>
+    <div class="pin" style="top: 80%; left: 26%;" onclick="hamleYap('Muğla')">M</div>
+    <div class="pin" style="top: 38%; left: 40%;" onclick="hamleYap('İnönü')">İn</div>
+    <div class="pin" style="top: 35%; left: 50%;" onclick="hamleYap('Ankara')">A</div>
+    <div class="pin" style="top: 18%; left: 63%;" onclick="hamleYap('Samsun')">Sa</div>
+    <div class="pin" style="top: 18%; left: 75%;" onclick="hamleYap('Trabzon')">Tr</div>
+    <div class="pin" style="top: 86%; left: 70%;" onclick="hamleYap('Hatay')">H</div>
+    <div class="pin" style="top: 22%; left: 91%;" onclick="hamleYap('Kars')">K</div>
+</div>
+
+<div id="status-board">
+    <div class="p-log">1. Komutan Tanınırlık: <br><span id="p1-list">-</span></div>
+    <div class="p-log">2. Komutan Tanınırlık: <br><span id="p2-list">-</span></div>
+    <div class="p-log">3. Komutan Tanınırlık: <br><span id="p3-list">-</span></div>
+    <div class="p-log">4. Komutan Tanınırlık: <br><span id="p4-list">-</span></div>
+</div>
+
+<div id="overlay"></div>
+<div id="modal">
+    <h2 id="m-city" style="margin:0; color:red; font-size:18px;">Hedef Bölge</h2>
+    <p id="m-text">Durum raporu...</p>
+    <div id="m-opts"></div>
+</div>
+
+<div id="winner-screen" class="winner-screen">
+    <h1>GELDİKLERİ GİBİ GİTTİLER!</h1>
+    <h2 id="winner-name">X. KOMUTAN VATANI KURTARDI!</h2>
+    <p>Halk seni Müşir rütbesine layık gördü. 12 Sancak dalgalanıyor.</p>
+    <button onclick="location.reload()" class="start-btn" style="max-width:200px; margin-top:30px;">Yeni Harekât</button>
+</div>
+
+<script>
+    function oyunuBaslat() {
+        document.getElementById('intro-screen').style.display = 'none';
+    }
+
+    const allQuestions = {
+        'Selanik': [
+            {q:"Atatürk’ün doğduğu evin mahalle adı nedir?", a:"Koca Kasım Paşa", o:["Koca Kasım Paşa","Şemsi Efendi","İsabey","Cumhuriyet"]},
+            {q:"Mustafa Kemal’in yarım bıraktığı sivil okul?", a:"Mülkiye Rüştiyesi", o:["Mülkiye Rüştiyesi","Şemsi Efendi","Askeri İdadi","Harp Okulu"]},
+            {q:"Zübeyde Hanım'ın Atatürk'ün gitmesini istediği ilk okul?", a:"Mahalle Mektebi", o:["Mahalle Mektebi","Şemsi Efendi","Askeri Rüştiye","Mülkiye"]},
+            {q:"Ali Rıza Efendi'nin oğlunun gitmesini istediği modern okul?", a:"Şemsi Efendi", o:["Şemsi Efendi","Mahalle Mektebi","Askeri İdadi","Harp Akademisi"]},
+            {q:"Selanik hangi ordu müfettişliği merkezidir?", a:"3. Ordu", o:["3. Ordu","1. Ordu","5. Ordu","9. Ordu"]},
+            {q:"Mustafa Kemal'e 'Kemal' ismini veren öğretmeni Mustafa Efendi'nin branşı?", a:"Matematik", o:["Matematik","Tarih","Fransızca","Edebiyat"]},
+            {q:"Selanik'te Türk fikir hayatını etkileyen gazete?", a:"Genç Kalemler", o:["Genç Kalemler","İrade-i Milliye","Tercüman-ı Hakikat","Volkan"]}
+        ],
+        'İstanbul': [
+            {q:"31 Mart Vakası'nı bastıran ordunun kurmay başkanı?", a:"Mustafa Kemal", o:["Mustafa Kemal","Enver Paşa","Mahmut Şevket Paşa","Kazım Karabekir"]},
+            {q:"Mondros Ateşkesi hangi gemide imzalandı?", a:"Agamemnon", o:["Agamemnon","Bandırma","Yavuz","Hamidiye"]},
+            {q:"Mustafa Kemal'in 'Geldikleri gibi giderler' dediği tekne?", a:"Kartal İstimbotu", o:["Kartal İstimbotu","Savarona","Gülcemal","Peyk-i Şevket"]},
+            {q:"Osmanlı'nın ilk anayasası Kanun-i Esasi hangi yıl ilan edildi?", a:"1876", o:["1876","1908","1921","1839"]},
+            {q:"İşgalcilerin İstanbul'u resmen işgal etme sebebi?", a:"Misak-ı Milli'nin kabulü", o:["Misak-ı Milli'nin kabulü","Sivas Kongresi","Amasya Tamimi","TBMM'nin açılması"]},
+            {q:"İttihat ve Terakki Cemiyeti'nin fikir babalarından olduğu şehir?", a:"İstanbul", o:["İstanbul","Selanik","Manastır","Şam"]},
+            {q:"Osmanlı Meclisi'nin resmi adı nedir?", a:"Meclis-i Mebusan", o:["Meclis-i Mebusan","TBMM","Kurultay","Divan-ı Hümayun"]}
+        ],
+        'Trakya': [
+            {q:"Lozan'da savaş tazminatı olarak alınan yer?", a:"Karaağaç", o:["Karaağaç","Edirne","Tekirdağ","İpsala"]},
+            {q:"Trakya-Paşaeli Cemiyeti'nin çıkardığı gazete?", a:"Yeni Edirne", o:["Yeni Edirne","İstikbal","Albaryrak","Dersaadet"]},
+            {q:"M. Kemal Balkan Savaşlarında nerenin komutanıydı?", a:"Bolayır Kolordusu", o:["Bolayır Kolordusu","Hareket Ordusu","Yıldırım Orduları","9. Ordu"]},
+            {q:"Mudanya sonrası Trakya'yı teslim alan general?", a:"Refet Bele", o:["Refet Bele","İsmet İnönü","Fevzi Çakmak","Ali Fuat Paşa"]},
+            {q:"Trakya-Paşaeli Cemiyeti kime karşı kuruldu?", a:"Yunanistan", o:["Yunanistan","Bulgaristan","Rusya","İngiltere"]},
+            {q:"Edirne ve Kırklareli hangi antlaşmayla kurtuldu?", a:"Mudanya", o:["Mudanya","Mondros","Gümrü","Lozan"]},
+            {q:"Trakya-Paşaeli cemiyeti hangi kongreyi düzenledi?", a:"Lüleburgaz", o:["Lüleburgaz","Sivas","Erzurum","Balıkesir"]}
+        ],
+        'Çanakkale': [
+            {q:"Atatürk'ün 'Anafartalar Kahramanı' olduğu yıl?", a:"1915", o:["1915","1914","1916","1918"]},
+            {q:"M. Kemal'in Çanakkale'de görev yaptığı tümen numarası?", a:"19. Tümen", o:["19. Tümen","5. Tümen","57. Tümen","3. Tümen"]},
+            {q:"İngilizlerin Çanakkale'de durdurulduğu ilk yer?", a:"Arıburnu", o:["Arıburnu","Conkbayırı","Kilitbahir","Seddülbahir"]},
+            {q:"57. Alay'ın tamamının şehit olduğu tepe?", a:"Conkbayırı", o:["Conkbayırı","Kanlısırt","Anafartalar","Kireçtepe"]},
+            {q:"Çanakkale'de M. Kemal'in rütbesi neye yükseldi?", a:"Albay", o:["Albay","Yarbay","General","Binbaşı"]},
+            {q:"Çanakkale geçilseydi hangi başkent düşecekti?", a:"İstanbul", o:["İstanbul","Ankara","Edirne","Bursa"]},
+            {q:"Çanakkale Savaşlarında Atatürk'e hangi madalya verildi?", a:"Gümüş Liyakat", o:["Gümüş Liyakat","İstiklal Madalyası","Altın Kılıç","Demir Haç"]}
+        ],
+        'İzmir': [
+            {q:"Hasan Tahsin'in gerçek adı nedir?", a:"Osman Nevres", o:["Osman Nevres","Süleyman Fethi","Mehmet Akif","Namık Kemal"]},
+            {q:"İzmir'in işgaline zemin hazırlayan konferans?", a:"Paris Barış", o:["Paris Barış","Londra","San Remo","Berlin"]},
+            {q:"İzmir haksızlığını belirten raporun sahibi Amiral?", a:"Bristol", o:["Bristol","Milne","Harbourd","Sanders"]},
+            {q:"İktisat Kongresi'nin toplandığı şehir?", a:"İzmir", o:["İzmir","Ankara","İstanbul","Bursa"]},
+            {q:"9 Eylül'de İzmir'e giren ordunun başındaki isim?", a:"Mustafa Kemal", o:["Mustafa Kemal","Fevzi Çakmak","Kazım Karabekir","Fahrettin Altay"]},
+            {q:"İzmir işgal edildiğinde sessiz kalan padişah?", a:"Vahdettin", o:["Vahdettin","Abdülhamid","Reşat","Murat"]},
+            {q:"İzmir'de kurulan ilk milli cemiyet?", a:"Müdafaa-i Hukuk-ı Osmaniye", o:["Müdafaa-i Hukuk-ı Osmaniye","Redd-i İlhak","Kilikyalılar","Mavri Mira"]}
+        ],
+        'Muğla': [
+            {q:"Muğla'yı işgal eden ancak Türklerle savaşmayan devlet?", a:"İtalya", o:["İtalya","Fransa","İngiltere","Yunanistan"]},
+            {q:"İtalyanlar Anadolu'dan tamamen ne zaman çıktı?", a:"1921 Ankara", o:["1921 Ankara","Sakarya Öncesi","Lozan Sonrası","Gümrü"]},
+            {q:"Muğla'daki direniş grubunun adı?", a:"Menteşe", o:["Menteşe","Demirci","Efe","Yörük"]},
+            {q:"Muğla hangi yerel kongreye delege gönderdi?", a:"Nazilli", o:["Nazilli","Sivas","Erzurum","Balıkesir"]},
+            {q:"Kuvayımilliye'nin Muğla kurucusu?", a:"Karyağdı Süleyman", o:["Karyağdı Süleyman","Yörük Ali","Çakırcalı","Demirci Efe"]},
+            {q:"İtalyanların işgal yöntemi nasıldı?", a:"Ekonomik ve Kültürel", o:["Ekonomik ve Kültürel","Sert ve Askeri","Dini","Siyasi"]},
+            {q:"Muğla halkı direniş için ne kurdu?", a:"Müdafaa-i Hukuk", o:["Müdafaa-i Hukuk","Kilikyalılar","Redd-i İlhak","Pontus"]}
+        ],
+        'İnönü': [
+            {q:"I. İnönü Savaşı sonrası kabul edilen ilk anayasa?", a:"Teşkilat-ı Esasiye", o:["Teşkilat-ı Esasiye","Kanun-i Esasi","Tanzimat","Islahat"]},
+            {q:"'Milletin ters talihini yendiniz' kime söylendi?", a:"İsmet İnönü", o:["İsmet İnönü","Kazım Karabekir","Ali Fuat","Refet Bele"]},
+            {q:"İstiklal Marşı hangi yılda kabul edildi?", a:"1921", o:["1921","1920","1923","1919"]},
+            {q:"II. İnönü Savaşı'nda hangi tepe çok önemlidir?", a:"Metristepe", o:["Metristepe","Kocatepe","Dumlupınar","Kanlısırt"]},
+            {q:"Londra Konferansı'na TBMM adına kim katıldı?", a:"Bekir Sami Bey", o:["Bekir Sami Bey","İsmet Paşa","Rauf Orbay","Yusuf Kemal"]},
+            {q:"İsmet Paşa'ya generallik rütbesi nerede verildi?", a:"I. İnönü", o:["I. İnönü","II. İnönü","Sakarya","Mudanya"]},
+            {q:"Düzenli ordunun Batı'daki ilk zaferi?", a:"I. İnönü", o:["I. İnönü","Gümrü","Sakarya","Dumlupınar"]}
+        ],
+        'Ankara': [
+            {q:"Atatürk Ankara'da ilk nerede konakladı?", a:"Ziraat Mektebi", o:["Ziraat Mektebi","Çankaya Köşkü","TBMM","Anıtkabir"]},
+            {q:"Ankara'da toplanan Maarif Kongresi'nin konusu?", a:"Eğitim", o:["Eğitim","Ekonomi","Ordu","Tarım"]},
+            {q:"TBMM'nin açıldığı gün hangisidir?", a:"23 Nisan 1920", o:["23 Nisan 1920","19 Mayıs 1919","29 Ekim 1923","13 Ekim 1923"]},
+            {q:"Ankara ne zaman başkent oldu?", a:"13 Ekim 1923", o:["13 Ekim 1923","29 Ekim 1923","23 Nisan 1920","19 Mayıs 1919"]},
+            {q:"Ankara'da basılan ilk resmi gazete?", a:"Hakimiyet-i Milliye", o:["Hakimiyet-i Milliye","İrade-i Milliye","Ceride","Resmi Gazete"]},
+            {q:"TBMM'yi tanıyan ilk Müslüman devlet?", a:"Afganistan", o:["Afganistan","İran","Irak","Pakistan"]},
+            {q:"Anıtkabir'in mimarlarından biri?", a:"Emin Onat", o:["Emin Onat","Mimar Sinan","Vedat Tek","Kemaleddin"]}
+        ],
+        'Samsun': [
+            {q:"M. Kemal Samsun'a hangi unvanla çıktı?", a:"9. Ordu Müfettişi", o:["9. Ordu Müfettişi","Başkomutan","Cumhurbaşkanı","Vali"]},
+            {q:"Sivas Kongresi'ni engellemeye çalışan Elazığ Valisi?", a:"Ali Galip", o:["Ali Galip","Damat Ferit","Anzavur","Ethem"]},
+            {q:"Manda ve Himaye KESİNLİKLE nerede reddedildi?", a:"Sivas", o:["Sivas","Erzurum","Amasya","Samsun"]},
+            {q:"Milli bilinci uyandıran ilk genelge?", a:"Havza", o:["Havza","Amasya","Erzurum","Sivas"]},
+            {q:"Temsil Heyeti'nin tüm yurdu temsil ettiği yer?", a:"Sivas Kongresi", o:["Sivas Kongresi","Erzurum Kongresi","Amasya Görüşmesi","TBMM"]},
+            {q:"Milli Mücadele'nin ilk belgesi sayılan rapor?", a:"Samsun Raporu", o:["Samsun Raporu","Havza Tamimi","Amasya Tamimi","Bristol"]},
+            {q:"Sivas Kongresi'nde kurulan milli gazete?", a:"İrade-i Milliye", o:["İrade-i Milliye","Hakimiyet-i Milliye","Takvim","Vakit"]}
+        ],
+        'Trabzon': [
+            {q:"Trabzon'daki Rum hayalinin devlet adı?", a:"Pontus Rum", o:["Pontus Rum","Megali İdea","Bizans","Ermenistan"]},
+            {q:"Trabzon Muhafaza-i Hukuk'un yayın organı?", a:"İstikbal", o:["İstikbal","Albayrak","Vakit","İleri"]},
+            {q:"Rusya'dan gelen silahların taşındığı hat?", a:"İnebolu-Trabzon", o:["İnebolu-Trabzon","Hicaz","Berlin","Samsun"]},
+            {q:"Trabzon Erzurum Kongresi'ne kaç delege gönderdi?", a:"17", o:["17","5","10","20"]},
+            {q:"Karadeniz'deki Rum çetelerin adı?", a:"Kordos", o:["Kordos","Mavri Mira","Etnik-i Eterya","Hınçak"]},
+            {q:"Karadeniz'de asayişi sağlayan ordu?", a:"Merkez Ordusu", o:["Merkez Ordusu","15. Kolordu","Hareket Ordusu","Kuva-yi İnzibatiye"]},
+            {q:"Trabzon Muhafaza-i Hukuk kime karşı kuruldu?", a:"Rum ve Ermeni", o:["Rum ve Ermeni","İtalyan","Fransız","İngiliz"]}
+        ],
+        'Hatay': [
+            {q:"Atatürk Hatay için hangi takma ismi kullandı?", a:"Asım Us", o:["Asım Us","Genç Subay","Milli Ses","Asker"]},
+            {q:"Güneyde Fransızlara karşı ilk direniş nerede?", a:"Dörtyol", o:["Dörtyol","Antep","Maraş","Urfa"]},
+            {q:"Hatay'ın anavatana katıldığı yıl?", a:"1939", o:["1939","1938","1923","1921"]},
+            {q:"Hatay'ın ilk ve tek Cumhurbaşkanı?", a:"Tayfur Sökmen", o:["Tayfur Sökmen","Fevzi Çakmak","Abdurrahman Melek","Rauf Orbay"]},
+            {q:"Fransızlarla Hatay'ın dışarıda kaldığı antlaşma?", a:"1921 Ankara", o:["1921 Ankara","Gümrü","Lozan","Mondros"]},
+            {q:"Güneyde Fransızlara karşı kim savaştı?", a:"Kuvayımilliye", o:["Kuvayımilliye","Düzenli Ordu","Yeniçeri","Nizam-ı Cedid"]},
+            {q:"Maraş'a hangi unvan verildi?", a:"Kahraman", o:["Kahraman","Gazi","Şanlı","Yiğit"]}
+        ],
+        'Kars': [
+            {q:"TBMM'nin ilk askeri başarısı olan antlaşma?", a:"Gümrü", o:["Gümrü","Moskova","Kars","Ankara"]},
+            {q:"'Yetimler Babası' olarak bilinen komutan?", a:"Kazım Karabekir", o:["Kazım Karabekir","İsmet Paşa","Fevzi Çakmak","Refet Bele"]},
+            {q:"Doğu sınırımızı belirleyen SON antlaşma?", a:"Kars", o:["Kars","Gümrü","Moskova","Lozan"]},
+            {q:"Misak-ı Milli'den verilen ilk taviz?", a:"Batum", o:["Batum","Hatay","Musul","Kars"]},
+            {q:"Kars Kalesi'ni alan komutan?", a:"Kazım Karabekir", o:["Kazım Karabekir","Ali Fuat","Refet","Rauf"]},
+            {q:"Ermeniler hangi savaştan sonra Sevr'den vazgeçti?", a:"Doğu Cephesi", o:["Doğu Cephesi","Batı Cephesi","Güney Cephesi","Çanakkale"]},
+            {q:"Ermeni göç kanununun adı?", a:"Sevk ve Tehcir", o:["Sevk ve Tehcir","Mecburi İskan","Teşkilat-ı Esasiye","Kanun-i Esasi"]}
+        ]
+    };
+
+    let pData = [{done:[],mustGo:null},{done:[],mustGo:null},{done:[],mustGo:null},{done:[],mustGo:null}];
+    let turn = 0;
+
+    function hamleYap(city) {
+        let currentP = pData[turn];
+        if (currentP.mustGo && currentP.mustGo !== city) {
+            alert("Geri çekilmek yok! Önce " + currentP.mustGo + " hedefini tamamlamalısın.");
+            return;
+        }
+
+        let qSet = allQuestions[city];
+        let s = qSet[Math.floor(Math.random() * qSet.length)];
+        document.getElementById('m-city').innerText = city;
+        document.getElementById('m-text').innerText = s.q;
+        let div = document.getElementById('m-opts');
+        div.innerHTML = '';
+        s.o.sort(() => Math.random() - 0.5).forEach(opt => {
+            let b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = opt;
+            b.onclick = () => cevapla(city, opt, s.a);
+            div.appendChild(b);
+        });
+        document.getElementById('modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    function cevapla(city, sec, dogru) {
+        let currentP = pData[turn];
+        document.getElementById('modal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+
+        if (sec === dogru) {
+            alert("DOĞRU! Sancak dikildi.");
+            if (!currentP.done.includes(city)) currentP.done.push(city);
+            currentP.mustGo = null;
+        } else {
+            alert("YANLIŞ! İnsanlar sana inanmadı. Geri çekilmek yok, tekrar sıra sana geldiğinde bu şehri ikna etmek zorundasın!");
+            currentP.mustGo = city;
+        }
+
+        uiGuncelle();
+        if (currentP.done.length === 12) {
+            document.getElementById('winner-name').innerText = (turn + 1) + ". KOMUTAN VATANI KURTARDI!";
+            document.getElementById('winner-screen').style.display = 'flex';
+        } else {
+            turn = (turn + 1) % 4;
+            turnGuncelle();
+        }
+    }
+
+    function uiGuncelle() {
+        for (let i = 0; i < 4; i++) {
+            document.getElementById(`p${i+1}-count`).innerText = pData[i].done.length;
+            document.getElementById(`p${i+1}-list`).innerText = pData[i].done.length > 0 ? pData[i].done.join(", ") : "-";
+        }
+    }
+
+    function turnGuncelle() {
+        document.getElementById('turn-name').innerText = (turn + 1) + ". Komutan";
+        for (let i = 1; i <= 4; i++) document.getElementById(`p${i}-ui`).classList.remove('active-p');
+        document.getElementById(`p${turn+1}-ui`).classList.add('active-p');
+    }
+</script>
+</body>
+</html>
