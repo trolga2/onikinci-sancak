@@ -5,10 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Onikinci Sancak</title>
     <style>
+        * { box-sizing: border-box; }
         body { font-family: sans-serif; text-align: center; background: #1a1a1a; color: white; margin: 0; padding: 0; overflow-x: hidden; }
-        
-        /* Hikaye (Giriş) Ekranı */
-        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+
+        /* Setup Ekranı */
+        #setup-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.97); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        #setup-box { background: #222; border: 2px solid red; padding: 24px; border-radius: 10px; width: 100%; max-width: 400px; text-align: left; box-shadow: 0 0 20px red; }
+        #setup-box h2 { color: red; text-align: center; margin-top: 0; letter-spacing: 2px; }
+        .setup-label { color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 6px; }
+        .count-btns { display: flex; gap: 8px; }
+        .count-btn { flex: 1; padding: 10px 0; border-radius: 8px; border: 2px solid #444; background: transparent; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .count-btn.active { border-color: red; background: red; }
+        .name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .name-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .name-input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid #444; background: #111; color: white; font-size: 14px; outline: none; }
+        .name-input:focus { border-color: red; }
+
+        /* Hikaye Ekranı */
+        #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         #intro-box { background: #222; border: 2px solid red; padding: 20px; border-radius: 10px; max-width: 500px; text-align: left; box-shadow: 0 0 20px red; }
         #intro-box h1 { color: red; text-align: center; margin-top: 0; }
         #intro-box p { font-size: 15px; line-height: 1.5; color: #ddd; }
@@ -18,20 +32,26 @@
         #header { background: #333; padding: 10px; border-bottom: 2px solid red; position: sticky; top: 0; z-index: 1000; }
         .player-info { display: inline-block; margin: 2px 5px; padding: 5px 8px; border-radius: 5px; font-size: 11px; background: #222; border: 1px solid #444; }
         .active-p { border: 2px solid #00ff00; background: #333; box-shadow: 0 0 10px #00ff00; transform: scale(1.05); }
-        
+
         #game-container { position: relative; display: inline-block; width: 100%; max-width: 800px; margin-top: 10px; }
         img { width: 100%; height: auto; display: block; border: 2px solid #444; }
-        
+
         .pin { position: absolute; width: 26px; height: 26px; background: red; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; border: 2px solid white; cursor: pointer; font-weight: bold; font-size: 10px; box-shadow: 0 0 8px black; transition: transform 0.2s; }
         .pin:hover { transform: scale(1.2); }
 
-        #status-board { background: #222; padding: 10px; font-size: 10px; text-align: left; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; border-top: 1px solid red; }
+        #status-board { background: #222; padding: 10px; font-size: 10px; text-align: left; display: grid; gap: 5px; border-top: 1px solid red; }
         .p-log { border: 1px solid #444; padding: 5px; min-height: 40px; }
-        
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; z-index: 2000; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2e2e2e; color: white; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; z-index: 2000; box-shadow: 0 0 30px rgba(0,0,0,0.7); border: 1px solid #444; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1500; }
-        button.opt-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; border: 1px solid #ccc; background: #f0f0f0; }
-        
+        button.opt-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; border: 1px solid #555; background: #3a3a3a; color: white; transition: background 0.15s; }
+        button.opt-btn:hover { background: #4a4a4a; }
+
+        /* Toast */
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px); background: #1a1a1a; border: 2px solid red; color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.35s ease, opacity 0.35s ease; opacity: 0; max-width: 88%; text-align: center; box-shadow: 0 0 20px rgba(255,0,0,0.5); line-height: 1.4; }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        #toast.correct { border-color: #00cc66; box-shadow: 0 0 20px rgba(0,204,102,0.5); }
+
         .winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #8B0000, #000000); color: white; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; text-align: center; padding: 20px; }
         .winner-screen h1 { font-size: 40px; color: gold; text-shadow: 2px 2px 5px black; }
         .winner-screen h2 { font-size: 25px; margin-bottom: 30px; }
@@ -39,11 +59,28 @@
 </head>
 <body>
 
+<!-- Setup Ekranı -->
+<div id="setup-screen">
+    <div id="setup-box">
+        <h2>ONİKİNCİ SANCAK</h2>
+        <div class="setup-label">Komutan Sayısı</div>
+        <div class="count-btns">
+            <button class="count-btn" onclick="setCount(2)">2</button>
+            <button class="count-btn active" onclick="setCount(3)">3</button>
+            <button class="count-btn" onclick="setCount(4)">4</button>
+        </div>
+        <div class="setup-label">Komutan İsimleri</div>
+        <div id="name-inputs"></div>
+        <button class="start-btn" onclick="setupTamamla()">HAREKÂTA HAZIR →</button>
+    </div>
+</div>
+
+<!-- Hikaye Ekranı -->
 <div id="intro-screen">
     <div id="intro-box">
         <h1>ONİKİNCİ SANCAK</h1>
         <p>Yıl 1919... Vatan toprakları işgal altında.</p>
-        <p>Halk umutsuz, ordular dağıtılmış. Karargâh seni ve diğer 3 komutanı Anadolu'ya gönderiyor.</p>
+        <p>Halk umutsuz, ordular dağıtılmış. Karargâh seni ve <span id="intro-player-count">diğer 3 komutanı</span> Anadolu'ya gönderiyor.</p>
         <p><b>Göreviniz:</b> Haritadaki 12 hedefi tayin edip şehirlere gitmek, halkın güvenini kazanıp istiklal ateşini yakmak. Doğru kararlar vererek <b>Tanınırlığını</b> artırmalısın. Eğer yanılırsan insanlar sana inanmaz ve onları ikna edene kadar o şehirden <b>geri çekilmek yok!</b></p>
         <p>12 Sancağı ilk diken komutan vatanı kurtaracak.</p>
         <button class="start-btn" onclick="oyunuBaslat()">HAREKÂTI BAŞLAT</button>
@@ -51,11 +88,8 @@
 </div>
 
 <div id="header">
-    <div id="p1-ui" class="player-info active-p">1. Komutan: <span id="p1-count">0</span>/12</div>
-    <div id="p2-ui" class="player-info">2. Komutan: <span id="p2-count">0</span>/12</div>
-    <div id="p3-ui" class="player-info">3. Komutan: <span id="p3-count">0</span>/12</div>
-    <div id="p4-ui" class="player-info">4. Komutan: <span id="p4-count">0</span>/12</div>
-    <div style="margin-top:8px; color:yellow; font-size: 13px;">Harekât Emri Bekleniyor: <b id="turn-name">1. Komutan</b></div>
+    <div id="players-header"></div>
+    <div style="margin-top:8px; color:yellow; font-size: 13px;">Harekât Emri Bekleniyor: <b id="turn-name">-</b></div>
     <div style="margin-top:3px; font-size:11px; color:#aaa;">(Hedef Tayin Et)</div>
 </div>
 
@@ -75,12 +109,7 @@
     <div class="pin" style="top: 22%; left: 91%;" onclick="hamleYap('Kars')">K</div>
 </div>
 
-<div id="status-board">
-    <div class="p-log">1. Komutan Tanınırlık: <br><span id="p1-list">-</span></div>
-    <div class="p-log">2. Komutan Tanınırlık: <br><span id="p2-list">-</span></div>
-    <div class="p-log">3. Komutan Tanınırlık: <br><span id="p3-list">-</span></div>
-    <div class="p-log">4. Komutan Tanınırlık: <br><span id="p4-list">-</span></div>
-</div>
+<div id="status-board"></div>
 
 <div id="overlay"></div>
 <div id="modal">
@@ -88,6 +117,8 @@
     <p id="m-text">Durum raporu...</p>
     <div id="m-opts"></div>
 </div>
+
+<div id="toast"></div>
 
 <div id="winner-screen" class="winner-screen">
     <h1>GELDİKLERİ GİBİ GİTTİLER!</h1>
@@ -97,14 +128,77 @@
 </div>
 
 <script>
+    const COLORS = ['#e63946','#457b9d','#2a9d8f','#e9c46a'];
+    let numPlayers = 3;
+    let playerNames = [];
+    let pData = [];
+    let turn = 0;
+
+    function setCount(n) {
+        numPlayers = n;
+        document.querySelectorAll('.count-btn').forEach((b, i) => b.classList.toggle('active', i === n - 2));
+        renderNameInputs();
+    }
+
+    function renderNameInputs() {
+        const div = document.getElementById('name-inputs');
+        div.innerHTML = '';
+        for (let i = 0; i < numPlayers; i++) {
+            div.innerHTML += `<div class="name-row">
+                <div class="name-dot" style="background:${COLORS[i]}"></div>
+                <input class="name-input" id="name-${i}" placeholder="${i+1}. Komutan" maxlength="16">
+            </div>`;
+        }
+    }
+
+    function setupTamamla() {
+        playerNames = [];
+        for (let i = 0; i < numPlayers; i++) {
+            const v = document.getElementById(`name-${i}`).value.trim();
+            playerNames.push(v || `${i+1}. Komutan`);
+        }
+        const digerSayi = numPlayers === 2 ? "diğer 1 komutanı" : numPlayers === 3 ? "diğer 2 komutanı" : "diğer 3 komutanı";
+        document.getElementById('intro-player-count').innerText = digerSayi;
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('intro-screen').style.display = 'flex';
+    }
+
     function oyunuBaslat() {
         document.getElementById('intro-screen').style.display = 'none';
+        pData = playerNames.map(() => ({ done: [], mustGo: null }));
+        renderHeader();
+        renderStatusBoard();
+        turnGuncelle();
+    }
+
+    function renderHeader() {
+        document.getElementById('players-header').innerHTML = playerNames.map((name, i) =>
+            `<div id="p${i}-ui" class="player-info ${i===0?'active-p':''}">
+                <span style="color:${COLORS[i]}">●</span> ${name}: <span id="p${i}-count">0</span>/12
+            </div>`
+        ).join('');
+    }
+
+    function renderStatusBoard() {
+        const sb = document.getElementById('status-board');
+        sb.style.gridTemplateColumns = numPlayers === 3 ? '1fr 1fr 1fr' : '1fr 1fr';
+        sb.innerHTML = playerNames.map((name, i) =>
+            `<div class="p-log"><span style="color:${COLORS[i]}">●</span> ${name} Tanınırlık:<br><span id="p${i}-list">-</span></div>`
+        ).join('');
+    }
+
+    function showToast(msg, isCorrect) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'show' + (isCorrect ? ' correct' : '');
+        clearTimeout(t._t);
+        t._t = setTimeout(() => { t.className = ''; }, 3000);
     }
 
     const allQuestions = {
         'Selanik': [
-            {q:"Atatürk’ün doğduğu evin mahalle adı nedir?", a:"Koca Kasım Paşa", o:["Koca Kasım Paşa","Şemsi Efendi","İsabey","Cumhuriyet"]},
-            {q:"Mustafa Kemal’in yarım bıraktığı sivil okul?", a:"Mülkiye Rüştiyesi", o:["Mülkiye Rüştiyesi","Şemsi Efendi","Askeri İdadi","Harp Okulu"]},
+            {q:"Atatürk'ün doğduğu evin mahalle adı nedir?", a:"Koca Kasım Paşa", o:["Koca Kasım Paşa","Şemsi Efendi","İsabey","Cumhuriyet"]},
+            {q:"Mustafa Kemal'in yarım bıraktığı sivil okul?", a:"Mülkiye Rüştiyesi", o:["Mülkiye Rüştiyesi","Şemsi Efendi","Askeri İdadi","Harp Okulu"]},
             {q:"Zübeyde Hanım'ın Atatürk'ün gitmesini istediği ilk okul?", a:"Mahalle Mektebi", o:["Mahalle Mektebi","Şemsi Efendi","Askeri Rüştiye","Mülkiye"]},
             {q:"Ali Rıza Efendi'nin oğlunun gitmesini istediği modern okul?", a:"Şemsi Efendi", o:["Şemsi Efendi","Mahalle Mektebi","Askeri İdadi","Harp Akademisi"]},
             {q:"Selanik hangi ordu müfettişliği merkezidir?", a:"3. Ordu", o:["3. Ordu","1. Ordu","5. Ordu","9. Ordu"]},
@@ -143,9 +237,9 @@
             {q:"İzmir'in işgaline zemin hazırlayan konferans?", a:"Paris Barış", o:["Paris Barış","Londra","San Remo","Berlin"]},
             {q:"İzmir haksızlığını belirten raporun sahibi Amiral?", a:"Bristol", o:["Bristol","Milne","Harbourd","Sanders"]},
             {q:"İktisat Kongresi'nin toplandığı şehir?", a:"İzmir", o:["İzmir","Ankara","İstanbul","Bursa"]},
-            {q:"9 Eylül'de İzmir'e giren ordunun başındaki isim?", a:"Mustafa Kemal", o:["Mustafa Kemal","Fevzi Çakmak","Kazım Karabekir","Fahrettin Altay"]},
+            {q:"9 Eylül'de İzmir'e fiilen giren süvari komutanı kimdir?", a:"Fahrettin Altay", o:["Fahrettin Altay","Mustafa Kemal","Fevzi Çakmak","Kazım Karabekir"]},
             {q:"İzmir işgal edildiğinde sessiz kalan padişah?", a:"Vahdettin", o:["Vahdettin","Abdülhamid","Reşat","Murat"]},
-            {q:"İzmir'de kurulan ilk milli cemiyet?", a:"Müdafaa-i Hukuk-ı Osmaniye", o:["Müdafaa-i Hukuk-ı Osmaniye","Redd-i İlhak","Kilikyalılar","Mavri Mira"]}
+            {q:"İzmir'de kurulan ilk milli direniş cemiyeti?", a:"Redd-i İlhak", o:["Redd-i İlhak","Müdafaa-i Hukuk-ı Osmaniye","Kilikyalılar","Mavri Mira"]}
         ],
         'Muğla': [
             {q:"Muğla'yı işgal eden ancak Türklerle savaşmayan devlet?", a:"İtalya", o:["İtalya","Fransa","İngiltere","Yunanistan"]},
@@ -188,12 +282,12 @@
             {q:"Trabzon Muhafaza-i Hukuk'un yayın organı?", a:"İstikbal", o:["İstikbal","Albayrak","Vakit","İleri"]},
             {q:"Rusya'dan gelen silahların taşındığı hat?", a:"İnebolu-Trabzon", o:["İnebolu-Trabzon","Hicaz","Berlin","Samsun"]},
             {q:"Trabzon Erzurum Kongresi'ne kaç delege gönderdi?", a:"17", o:["17","5","10","20"]},
-            {q:"Karadeniz'deki Rum çetelerin adı?", a:"Kordos", o:["Kordos","Mavri Mira","Etnik-i Eterya","Hınçak"]},
+            {q:"Trabzon'da Pontus Rum devleti kurmak isteyen çetelere karşı kurulan cemiyet?", a:"Trabzon Muhafaza-i Hukuk", o:["Trabzon Muhafaza-i Hukuk","Redd-i İlhak","Müdafaa-i Hukuk-ı Osmaniye","Kilikyalılar"]},
             {q:"Karadeniz'de asayişi sağlayan ordu?", a:"Merkez Ordusu", o:["Merkez Ordusu","15. Kolordu","Hareket Ordusu","Kuva-yi İnzibatiye"]},
             {q:"Trabzon Muhafaza-i Hukuk kime karşı kuruldu?", a:"Rum ve Ermeni", o:["Rum ve Ermeni","İtalyan","Fransız","İngiliz"]}
         ],
         'Hatay': [
-            {q:"Atatürk Hatay için hangi takma ismi kullandı?", a:"Asım Us", o:["Asım Us","Genç Subay","Milli Ses","Asker"]},
+            {q:"Fransızlara karşı Güney Cephesi'nde öne çıkan Türk subayı?", a:"Sütçü İmam", o:["Sütçü İmam","Kazım Karabekir","İsmet İnönü","Refet Bele"]},
             {q:"Güneyde Fransızlara karşı ilk direniş nerede?", a:"Dörtyol", o:["Dörtyol","Antep","Maraş","Urfa"]},
             {q:"Hatay'ın anavatana katıldığı yıl?", a:"1939", o:["1939","1938","1923","1921"]},
             {q:"Hatay'ın ilk ve tek Cumhurbaşkanı?", a:"Tayfur Sökmen", o:["Tayfur Sökmen","Fevzi Çakmak","Abdurrahman Melek","Rauf Orbay"]},
@@ -212,16 +306,12 @@
         ]
     };
 
-    let pData = [{done:[],mustGo:null},{done:[],mustGo:null},{done:[],mustGo:null},{done:[],mustGo:null}];
-    let turn = 0;
-
     function hamleYap(city) {
         let currentP = pData[turn];
         if (currentP.mustGo && currentP.mustGo !== city) {
-            alert("Geri çekilmek yok! Önce " + currentP.mustGo + " hedefini tamamlamalısın.");
+            showToast("⚠️ Geri çekilmek yok! Önce " + currentP.mustGo + " hedefini tamamlamalısın.", false);
             return;
         }
-
         let qSet = allQuestions[city];
         let s = qSet[Math.floor(Math.random() * qSet.length)];
         document.getElementById('m-city').innerText = city;
@@ -245,36 +335,41 @@
         document.getElementById('overlay').style.display = 'none';
 
         if (sec === dogru) {
-            alert("DOĞRU! Sancak dikildi.");
+            showToast("✅ DOĞRU! Sancak dikildi.", true);
             if (!currentP.done.includes(city)) currentP.done.push(city);
             currentP.mustGo = null;
         } else {
-            alert("YANLIŞ! İnsanlar sana inanmadı. Geri çekilmek yok, tekrar sıra sana geldiğinde bu şehri ikna etmek zorundasın!");
+            showToast("❌ YANLIŞ! İnsanlar sana inanmadı. Geri çekilmek yok, tekrar sıra sana geldiğinde bu şehri ikna etmek zorundasın!", false);
             currentP.mustGo = city;
         }
 
         uiGuncelle();
         if (currentP.done.length === 12) {
-            document.getElementById('winner-name').innerText = (turn + 1) + ". KOMUTAN VATANI KURTARDI!";
-            document.getElementById('winner-screen').style.display = 'flex';
+            document.getElementById('winner-name').innerText = playerNames[turn] + " VATANI KURTARDI!";
+            setTimeout(() => { document.getElementById('winner-screen').style.display = 'flex'; }, 1200);
         } else {
-            turn = (turn + 1) % 4;
+            turn = (turn + 1) % numPlayers;
             turnGuncelle();
         }
     }
 
     function uiGuncelle() {
-        for (let i = 0; i < 4; i++) {
-            document.getElementById(`p${i+1}-count`).innerText = pData[i].done.length;
-            document.getElementById(`p${i+1}-list`).innerText = pData[i].done.length > 0 ? pData[i].done.join(", ") : "-";
+        for (let i = 0; i < numPlayers; i++) {
+            document.getElementById(`p${i}-count`).innerText = pData[i].done.length;
+            document.getElementById(`p${i}-list`).innerText = pData[i].done.length > 0 ? pData[i].done.join(", ") : "-";
         }
     }
 
     function turnGuncelle() {
-        document.getElementById('turn-name').innerText = (turn + 1) + ". Komutan";
-        for (let i = 1; i <= 4; i++) document.getElementById(`p${i}-ui`).classList.remove('active-p');
-        document.getElementById(`p${turn+1}-ui`).classList.add('active-p');
+        document.getElementById('turn-name').innerText = playerNames[turn];
+        for (let i = 0; i < numPlayers; i++) {
+            document.getElementById(`p${i}-ui`).classList.toggle('active-p', i === turn);
+        }
     }
+
+    renderNameInputs();
+    setCount(3);
 </script>
 </body>
 </html>
+
