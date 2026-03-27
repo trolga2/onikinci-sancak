@@ -315,17 +315,7 @@
         document.getElementById('players-header').innerHTML = playerNames.map((n, i) => `<div id="p${i}-ui" class="player-info"><span style="color:${COLORS[i]}">●</span> ${n}: ${pData[i].done.length}/12</div>`).join('');
         document.getElementById('status-board').innerHTML = playerNames.map((n, i) => `<div class="p-log"><span style="color:${COLORS[i]}">●</span> <b>${n}:</b> ${pData[i].done.join(', ') || 'Henüz sancak yok'}</div>`).join('');
         
-        // Pinleri güncelle (Kim aldıysa onun rengi olsun)
-        document.querySelectorAll('.pin').forEach(pin => {
-            let cityName = pin.getAttribute('onclick').match(/'([^']+)'/)[1];
-            pin.classList.remove('done');
-            pin.style.background = '#cc0000';
-            pData.forEach((p, i) => {
-                if(p.done.includes(cityName)) {
-                    pin.classList.add('done');
-                    pin.style.background = COLORS[i];
-                }
-            });
+        //
         });
     }
     function turnGuncelle() {
