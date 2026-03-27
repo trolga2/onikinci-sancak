@@ -3,81 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Onikinci Sancak - Tam Sürüm</title>
+    <title>Onikinci Sancak - Orijinal Sürüm</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #121212; color: white; margin: 0; padding: 0; overflow-x: hidden; }
+        body { font-family: 'Georgia', serif; text-align: center; background: #050505; color: #e0e0e0; margin: 0; padding: 0; overflow-x: hidden; }
         
-        #setup-screen, #intro-screen, .winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 5000; }
-        #setup-screen { background: rgba(0,0,0,0.98); }
-        #intro-screen { background: rgba(0,0,0,0.96); display: none; }
-        .winner-screen { background: radial-gradient(circle, #8b0000, #000); display: none; }
-
-        #setup-box, #intro-box { background: #1a1a1a; border: 2px solid #b22222; padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; text-align: left; box-shadow: 0 0 40px rgba(178, 34, 34, 0.5); }
-        h2 { color: #e63946; text-align: center; letter-spacing: 2px; }
-
-        .count-btns { display: flex; gap: 10px; margin: 15px 0; }
-        .count-btn { flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #444; background: transparent; color: white; cursor: pointer; font-weight: bold; }
-        .count-btn.active { border-color: #e63946; background: #e63946; }
-        .name-input { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #444; background: #1a1a1a; color: white; }
-        .start-btn { width: 100%; background: #b22222; color: white; padding: 16px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 15px; }
-
-        #header { background: #1f1f1f; padding: 10px; border-bottom: 3px solid #b22222; position: sticky; top: 0; z-index: 1000; }
-        .player-info { display: inline-block; margin: 4px; padding: 6px 12px; border-radius: 6px; background: #2a2a2a; border: 1px solid #444; font-size: 11px; }
-        .active-p { border: 2px solid #ffd700; background: #333; transform: scale(1.05); }
-
-        /* HARİTA VE SANCAK HİZALAMA */
-        #game-container { position: relative; margin: 10px auto; width: 98%; max-width: 110vh; line-height: 0; }
-        img { width: 100%; height: auto; display: block; border: 2px solid #333; border-radius: 5px; }
-        .pin { 
-            position: absolute; width: 34px; height: 22px; background: #cc0000; border-left: 3px solid #ffd700; 
-            border-radius: 2px 6px 2px 2px; color: white; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; font-weight: bold; font-size: 11px; z-index: 5;
-            transform: translate(-50%, -100%); /* İğnenin ucunu tam koordinata sabitler */
+        /* GİRİŞ EKRANI - ALTIN & NEON KALİTESİ */
+        #setup-screen, #intro-screen, .winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 5000; background: radial-gradient(circle, #1a0000, #000); }
+        
+        #intro-box, #setup-box { 
+            background: #111; border: 3px solid #ffd700; padding: 30px; border-radius: 20px; 
+            width: 100%; max-width: 550px; text-align: center; 
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.1);
         }
-        .pin.done { background: #2a9d8f !important; border-left-color: white !important; }
 
-        #status-board { background: #1a1a1a; padding: 15px; display: grid; gap: 8px; border-top: 2px solid #b22222; font-size: 10px; }
-        .p-log { border: 1px solid #333; padding: 8px; background: #222; border-radius: 6px; text-align: left; }
+        h1 { color: #ffd700; text-shadow: 0 0 15px #ffd700; letter-spacing: 4px; margin-bottom: 25px; font-size: 28px; }
+        p { line-height: 1.8; font-size: 17px; color: #ddd; margin-bottom: 15px; text-align: justify; }
 
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #252525; padding: 25px; border-radius: 15px; width: 90%; max-width: 420px; z-index: 6000; border: 2px solid #b22222; }
+        /* ALTIN SARI PARLAYAN BUTON */
+        .gold-btn { 
+            background: linear-gradient(145deg, #ffd700, #b8860b); color: #000; padding: 18px 35px; 
+            border: none; border-radius: 50px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; box-shadow: 0 0 20px #ffd700; transition: 0.3s;
+            margin-top: 15px; width: 85%; font-size: 16px;
+        }
+        .gold-btn:hover { transform: scale(1.05); box-shadow: 0 0 35px #ffd700; }
+
+        /* OYUNCU PANELLERİ - NEON GLOW */
+        #header { background: #0f0f0f; padding: 15px; border-bottom: 3px solid #ffd700; position: sticky; top: 0; z-index: 1000; }
+        .player-info { 
+            display: inline-block; margin: 5px; padding: 12px 18px; border-radius: 12px; 
+            background: #1a1a1a; border: 1px solid #333; font-size: 14px; transition: 0.5s;
+            color: #aaa;
+        }
+        .active-p { 
+            border: 2px solid #ffd700; box-shadow: 0 0 25px #ffd700; 
+            transform: scale(1.08); background: #252525; color: #fff; 
+        }
+
+        #game-container { position: relative; margin: 20px auto; width: 98%; max-width: 1100px; }
+        img { width: 100%; height: auto; border: 2px solid #222; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        /* SANCAK TASARIMI & FIX */
+        .pin { 
+            position: absolute; width: 38px; height: 26px; background: #cc0000; border-left: 4px solid #ffd700; 
+            border-radius: 3px; color: white; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; font-weight: bold; font-size: 12px; z-index: 10;
+            transform: translate(-50%, -100%); /* Tam iğne ucu vuruşu */
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.6);
+        }
+        .pin.done { border-left-color: #fff; }
+
+        /* MODAL & SORULAR */
+        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #151515; padding: 35px; border-radius: 20px; width: 90%; max-width: 480px; z-index: 6000; border: 2px solid #ffd700; box-shadow: 0 0 50px #000; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5500; }
-        .opt-btn { display: block; width: 100%; margin: 10px 0; padding: 15px; border-radius: 8px; border: 1px solid #444; background: #333; color: white; cursor: pointer; font-weight: bold; text-align: left; }
-        .opt-btn:hover { background: #e63946; }
+        .opt-btn { display: block; width: 100%; margin: 15px 0; padding: 16px; border-radius: 10px; border: 1px solid #ffd700; background: transparent; color: #ffd700; cursor: pointer; font-weight: bold; text-align: left; font-size: 15px; }
+        .opt-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 15px #ffd700; }
 
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1a1a1a; border: 2px solid #b22222; padding: 15px 25px; border-radius: 10px; z-index: 9999; display: none; font-weight: bold; }
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: #111; border: 2px solid #ffd700; padding: 15px 30px; border-radius: 12px; z-index: 9999; display: none; font-weight: bold; color: #ffd700; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
     </style>
 </head>
 <body>
 
 <div id="setup-screen">
     <div id="setup-box">
-        <h2>ONİKİNCİ SANCAK</h2>
-        <div class="count-btns">
-            <button class="count-btn" onclick="setCount(2)">2</button>
-            <button class="count-btn active" onclick="setCount(3)">3</button>
-            <button class="count-btn" onclick="setCount(4)">4</button>
+        <h1>ONİKİNCİ SANCAK</h1>
+        <p style="text-align:center;">Harekâta katılacak komutan sayısını seçin:</p>
+        <div style="display:flex; gap:15px; justify-content:center; margin-bottom:25px;">
+            <button class="gold-btn" style="width:70px;" onclick="setCount(2)">2</button>
+            <button class="gold-btn" style="width:70px;" onclick="setCount(3)">3</button>
+            <button class="gold-btn" style="width:70px;" onclick="setCount(4)">4</button>
         </div>
         <div id="name-inputs"></div>
-        <div id="resume-box" style="display:none; text-align:center; border-top:1px solid #333; margin-top:10px; padding-top:10px;">
-            <button class="start-btn" style="background:#ffd700; color:black;" onclick="oyunuYukle()">HAREKÂTA DEVAM ET</button>
-        </div>
-        <button class="start-btn" onclick="setupTamamla()">YENİ HAREKÂT BAŞLAT</button>
+        <button class="gold-btn" onclick="setupTamamla()">KOMUTANLARI KAYDET</button>
     </div>
 </div>
 
-<div id="intro-screen">
+<div id="intro-screen" style="display:none;">
     <div id="intro-box">
-        <h2>GÖREV EMRİ</h2>
-        <p>1919... Anadolu işgal altında. 12 stratejik noktaya sancak dikerek direnişi başlatmalısın.</p>
-        <p><b>Kural:</b> Yanlış cevap halkın güvenini sarsar. O şehri ikna edene (doğru bilene) kadar geri çekilemezsin!</p>
-        <button class="start-btn" onclick="oyunuBaslat(true)">VATAN SİZE MİNNETTARDIR</button>
+        <h1>GÖREV EMRİ</h1>
+        <p>Yıl 1919... Vatan toprakları işgal altında. Halk umutsuz, ordular dağıtılmış. Karargâh seni ve diğer komutanları Anadolu'ya gönderiyor.</p>
+        <p>Göreviniz: Haritadaki 12 hedefi tayin edip şehirlere gitmek, halkın güvenini kazanıp istiklal ateşini yakmak.</p>
+        <p style="text-align:center; font-weight:bold; color:#ffd700;">12 Sancağı ilk diken komutan vatanı kurtaracak.</p>
+        <button class="gold-btn" onclick="oyunuBaslat(true)">HAREKÂTI BAŞLAT</button>
     </div>
 </div>
 
 <div id="header">
     <div id="players-header"></div>
-    <div style="margin-top:8px; color:#ffd700; font-weight:bold; font-size:14px;">SIRADAKİ: <span id="turn-name">-</span></div>
+    <div id="turn-info" style="margin-top:10px; color:#ffd700; font-weight:bold; letter-spacing:1px;">SIRADAKİ: <span id="turn-name">-</span></div>
 </div>
 
 <div id="game-container">
@@ -96,25 +110,23 @@
     <div class="pin" style="top: 22%; left: 91%;" onclick="hamleYap('Kars')">K</div>
 </div>
 
-<div id="status-board"></div>
-
 <div id="overlay"></div>
 <div id="modal">
-    <h2 id="m-city" style="font-size:18px; margin-bottom:10px;">Bölge</h2>
-    <p id="m-text" style="line-height:1.6; color:#ccc;"></p>
+    <h2 id="m-city" style="color:#ffd700; margin-bottom:15px;">Şehir</h2>
+    <p id="m-text" style="text-align:left; color:#fff; font-size:18px;"></p>
     <div id="m-opts"></div>
 </div>
 
 <div id="toast"></div>
 
-<div id="winner-screen" class="winner-screen">
-    <h1>GELDİKLERİ GİBİ GİTTİLER!</h1>
-    <h2 id="winner-name">KOMUTAN</h2>
-    <button onclick="localStorage.clear(); location.reload();" class="start-btn" style="max-width:220px;">YENİ DESTAN</button>
+<div id="winner-screen" class="winner-screen" style="display:none;">
+    <h1>VATAN KURTARILDI!</h1>
+    <h2 id="winner-name" style="font-size:32px;">KOMUTAN</h2>
+    <button onclick="localStorage.clear(); location.reload();" class="gold-btn">YENİ DESTAN YAZ</button>
 </div>
 
 <script>
-    const COLORS = ['#e63946','#457b9d','#2a9d8f','#f4a261'];
+    const COLORS = ['#e63946', '#457b9d', '#2a9d8f', '#f4a261'];
     let numPlayers = 3, playerNames = [], pData = [], turn = 0;
 
     const allQuestions = {
@@ -151,14 +163,14 @@
             {q:"M. Kemal'in Çanakkale'deki rütbesi?", a:"Yarbay", o:["Yarbay","Albay","General","Binbaşı"]},
             {q:"Boğazı geçilmez kılan mayın gemisi?", a:"Nusret", o:["Nusret","Yavuz","Hamidiye","Bandırma"]},
             {q:"Çanakkale'de M. Kemal'in komuta ettiği tümen?", a:"19. Tümen", o:["19. Tümen","57. Alay","Hareket Ordusu","Yıldırım Orduları"]},
-            {q:"18 Mart Çanakkale zaferinin mimarı 'Cevat Paşa'nın unvanı?", a:"18 Mart Kahramanı", o:["18 Mart Kahramanı","Anafartalar Kahramanı","Çöl Kaplanı","Plevne Kahramanı"]},
+            {q:"18 Mart Çanakkale zaferinin mimarı 'Cevat Paşa'?", a:"18 Mart Kahramanı", o:["18 Mart Kahramanı","Anafartalar Kahramanı","Çöl Kaplanı","Plevne Kahramanı"]},
             {q:"Çanakkale'de Türk ordusunun başında olan Alman general?", a:"Liman von Sanders", o:["Liman von Sanders","Colmar von der Goltz","Falkenhayn","Bismarck"]}
         ],
         'İzmir': [
             {q:"İzmir'de ilk kurşunu atan gazeteci?", a:"Hasan Tahsin", o:["Hasan Tahsin","Ali Kemal","Yakup Kadri","Yunus Nadi"]},
-            {q:"İzmir'in işgalinin haksızlığını kanıtlayan ilk uluslararası rapor?", a:"Amiral Bristol", o:["Amiral Bristol","Milne Hattı","General Harbourd","Samsun Raporu"]},
+            {q:"İzmir'in işgalinin haksızlığını kanıtlayan ilk rapor?", a:"Amiral Bristol", o:["Amiral Bristol","Milne Hattı","General Harbourd","Samsun Raporu"]},
             {q:"İzmir'in kurtuluş tarihi?", a:"9 Eylül 1922", o:["9 Eylül 1922","15 Mayıs 1919","30 Ağustos 1922","24 Temmuz 1923"]},
-            {q:"İzmir işgal edilmeden bir gün önce düzenlenen miting alanı?", a:"Maşatlık", o:["Maşatlık","Sultanahmet","Gülhane","Konak"]},
+            {q:"İzmir işgalinden önce düzenlenen miting alanı?", a:"Maşatlık", o:["Maşatlık","Sultanahmet","Gülhane","Konak"]},
             {q:"Hasan Tahsin'in asıl adı?", a:"Osman Nevres", o:["Osman Nevres","Mehmet Akif","Ali Fuat","Rauf Bey"]},
             {q:"İzmir'e giren ilk Türk süvari birliği komutanı?", a:"Fahrettin Altay", o:["Fahrettin Altay","İsmet İnönü","Fevzi Çakmak","Kazım Özalp"]},
             {q:"İzmir'in işgaline zemin hazırlayan konferans?", a:"Paris Barış", o:["Paris Barış","Londra","San Remo","Lozan"]}
@@ -166,7 +178,7 @@
         'Muğla': [
             {q:"Muğla ve Antalya'yı işgal eden devlet?", a:"İtalya", o:["İtalya","Fransa","İngiltere","Yunanistan"]},
             {q:"İtalya Anadolu'dan ne zaman tamamen çekildi?", a:"Sakarya sonrası", o:["Sakarya sonrası","II. İnönü sonrası","Büyük Taarruz","Mudanya"]},
-            {q:"İtalyanların çekilirken bıraktığı silahlar nerede kullanıldı?", a:"Batı Cephesi", o:["Batı Cephesi","Doğu Cephesi","Güney Cephesi","Kanal"]},
+            {q:"İtalyanların bıraktığı silahlar nerede kullanıldı?", a:"Batı Cephesi", o:["Batı Cephesi","Doğu Cephesi","Güney Cephesi","Kanal"]},
             {q:"Muğla direnişinde rol alan yerel güçler?", a:"Kuvayı Milliye", o:["Kuvayı Milliye","Düzenli Ordu","Ermeni Çeteleri","Pontus"]},
             {q:"Ege Denizi'nin eski adı?", a:"Adalar Denizi", o:["Adalar Denizi","Akdeniz","Marmara","Pontus"]},
             {q:"İtalya'ya Anadolu'da verilen ancak sonra vazgeçilen yer?", a:"İzmir", o:["İzmir","Antalya","Muğla","Konya"]},
@@ -195,14 +207,14 @@
             {q:"Milli Mücadele'nin ilk belgesi sayılan genelge?", a:"Havza Genelgesi", o:["Havza Genelgesi","Amasya Tamimi","Erzurum Kongresi","Sivas Kongresi"]},
             {q:"Samsun'a çıkış tarihi?", a:"19 Mayıs 1919", o:["19 Mayıs 1919","15 Mayıs 1919","23 Nisan 1920","16 Mart 1920"]},
             {q:"M. Kemal'i Samsun'a götüren gemi?", a:"Bandırma", o:["Bandırma","Hamidiye","Nusret","Yavuz"]},
-            {q:"Milli Mücadele'nin amacı, yöntemi ve gerekçesi nerede açıklandı?", a:"Amasya Tamimi", o:["Amasya Tamimi","Samsun Raporu","Misak-ı Milli","Lozan"]},
+            {q:"Milli Mücadele'nin amacı nerede açıklandı?", a:"Amasya Tamimi", o:["Amasya Tamimi","Samsun Raporu","Misak-ı Milli","Lozan"]},
             {q:"Bandırma Vapuru kaptanı?", a:"İsmail Hakkı Durusu", o:["İsmail Hakkı Durusu","Rauf Orbay","Ali Fuat","Hüseyin Rauf"]},
             {q:"M. Kemal'in Samsun'da hazırladığı ilk rapor?", a:"Samsun Raporu", o:["Samsun Raporu","Havza Raporu","Bristol Raporu","Harbourd Raporu"]}
         ],
         'Trabzon': [
             {q:"Karadeniz'de Rum devleti kurmak isteyen cemiyet?", a:"Pontus Rum", o:["Pontus Rum","Mavri Mira","Etnik-i Eterya","Taşnak"]},
             {q:"Trabzon'da kurulan yararlı cemiyet?", a:"Trabzon Muhafaza-i Hukuk", o:["Trabzon Muhafaza-i Hukuk","Kilikyalılar","Karakol","Redd-i İlhak"]},
-            {q:"Erzurum Kongresi'ni düzenleyen iki cemiyetten biri?", a:"Trabzon Muhafaza-i Hukuk", o:["Trabzon Muhafaza-i Hukuk","Milli Kongre","Hürriyet","İttihat"]},
+            {q:"Erzurum Kongresi'ni düzenleyen cemiyetlerden biri?", a:"Trabzon Muhafaza-i Hukuk", o:["Trabzon Muhafaza-i Hukuk","Milli Kongre","Hürriyet","İttihat"]},
             {q:"Trabzon ve çevresinin işgalini önleyen en büyük etken?", a:"Halkın direnişi", o:["Halkın direnişi","İngiliz yardımı","Lozan","Sevr"]},
             {q:"Trabzon'da Milli Mücadele'yi destekleyen gazete?", a:"İstikbal", o:["İstikbal","İrade-i Milliye","Hâkimiyet-i Milliye","Minber"]},
             {q:"Rusya'nın Trabzon'dan çekildiği anlaşma?", a:"Erzincan Mütarekesi", o:["Erzincan Mütarekesi","Brest-Litovsk","Moskova","Kars"]},
@@ -213,8 +225,8 @@
             {q:"Güney Cephesi hangi anlaşma ile kapandı?", a:"Ankara Anlaşması (1921)", o:["Ankara Anlaşması (1921)","Mudanya","Lozan","Gümrü"]},
             {q:"Hatay'ın anavatana katıldığı yıl?", a:"1939", o:["1939","1938","1923","1921"]},
             {q:"Güney Cephesi'nde Fransızlara karşı kim savaştı?", a:"Kuvayı Milliye", o:["Kuvayı Milliye","Düzenli Ordu","Yunan ordusu","Rus ordusu"]},
-            {q:"Hatay Cumhuriyeti'nin ilk ve tek cumhurbaşkanı?", a:"Tayfur Sökmen", o:["Tayfur Sökmen","Abdurrahman Melek","Rauf Orbay","Celal Bayar"]},
-            {q:"Güney direnişini başlatan 'Sütçü İmam' hangi ilimizdedir?", a:"Maraş", o:["Maraş","Antep","Urfa","Hatay"]},
+            {q:"Hatay Cumhuriyeti'nin ilk cumhurbaşkanı?", a:"Tayfur Sökmen", o:["Tayfur Sökmen","Abdurrahman Melek","Rauf Orbay","Celal Bayar"]},
+            {q:"'Sütçü İmam' direnişi hangi ilimizdedir?", a:"Maraş", o:["Maraş","Antep","Urfa","Hatay"]},
             {q:"Hatay sorununun çözümünde etkili olan rapor?", a:"Sandler Raporu", o:["Sandler Raporu","Bristol Raporu","Harbourd Raporu","Milne Hattı"]}
         ],
         'Kars': [
@@ -224,20 +236,19 @@
             {q:"Doğu sınırımızın kesinleştiği anlaşma?", a:"Kars Anlaşması", o:["Kars Anlaşması","Gümrü","Moskova","Lozan"]},
             {q:"Kazım Karabekir'e verilen unvan?", a:"Şark Fatihi", o:["Şark Fatihi","Edirne Fatihi","Çöl Kaplanı","Plevne Kahramanı"]},
             {q:"Kars'ın kurtuluş tarihi?", a:"30 Ekim 1920", o:["30 Ekim 1920","29 Ekim 1923","19 Mayıs 1919","30 Ağustos 1922"]},
-            {q:"Erzurum Kongresi'nin toplanmasında etkili olan cemiyet?", a:"Doğu Anadolu Müdafaa-i Hukuk", o:["Doğu Anadolu Müdafaa-i Hukuk","Kilikyalılar","Trakya-Paşaeli","Karakol"]}
+            {q:"Erzurum Kongresi'ni toplayan ana cemiyet?", a:"Doğu Anadolu Müdafaa-i Hukuk", o:["Doğu Anadolu Müdafaa-i Hukuk","Kilikyalılar","Trakya-Paşaeli","Karakol"]}
         ]
     };
 
     function setCount(n) {
         numPlayers = n;
-        document.querySelectorAll('.count-btn').forEach((b, i) => b.classList.toggle('active', i === n - 2));
         renderInputs();
     }
     function renderInputs() {
         const div = document.getElementById('name-inputs');
         div.innerHTML = '';
         for (let i = 0; i < numPlayers; i++) {
-            div.innerHTML += `<input class="name-input" id="name-${i}" placeholder="${i+1}. Komutan Adı" maxlength="15">`;
+            div.innerHTML += `<input style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ffd700; background:#111; color:white;" id="name-${i}" placeholder="${i+1}. Komutan Adı">`;
         }
     }
     function setupTamamla() {
@@ -254,7 +265,6 @@
             pData = playerNames.map(() => ({ done: [], mustGo: null, qIndex: {} }));
             Object.keys(allQuestions).forEach(c => pData.forEach(p => p.qIndex[c] = 0));
             turn = 0;
-            kaydet();
         }
         renderUI();
         turnGuncelle();
@@ -262,14 +272,14 @@
     function hamleYap(city) {
         let p = pData[turn];
         if (p.mustGo && p.mustGo !== city) return showToast("Önce " + p.mustGo + " hedefini tamamla!");
-        if (p.done.includes(city)) return showToast("Bu şehir zaten kurtarıldı.");
+        if (p.done.includes(city)) return showToast("Bu bölge zaten özgür.");
 
         let q = allQuestions[city][p.qIndex[city] % 7];
         document.getElementById('m-city').innerText = city + " Harekâtı";
         document.getElementById('m-text').innerText = q.q;
         let opts = document.getElementById('m-opts');
         opts.innerHTML = '';
-        [...q.o].sort(() => Math.random() - 0.5).forEach(o => {
+        q.o.forEach(o => {
             let btn = document.createElement('button');
             btn.className = 'opt-btn';
             btn.innerText = o;
@@ -287,42 +297,32 @@
         if (sec === dogru) {
             if (!p.done.includes(city)) p.done.push(city);
             p.mustGo = null;
-            showToast("✅ TEBRİKLER! Bölge kontrol altına alındı.", true);
+            showToast("✅ BÖLGE KURTARILDI!", true);
         } else {
             p.mustGo = city;
-            showToast("❌ HATA! Geri çekilmek yok!");
+            showToast("❌ HALK İKNA OLMADI! GERİ ÇEKİLMEK YOK.");
         }
         p.qIndex[city]++;
-        kaydet();
         renderUI();
         if (p.done.length === 12) {
-            document.getElementById('winner-name').innerText = playerNames[turn].toUpperCase() + " VATANI KURTARDI!";
+            document.getElementById('winner-name').innerText = playerNames[turn].toUpperCase();
             document.getElementById('winner-screen').style.display = 'flex';
         } else {
             turn = (turn + 1) % numPlayers;
             turnGuncelle();
         }
     }
-    function kaydet() { localStorage.setItem('onikinciSancakKayit', JSON.stringify({numPlayers, playerNames, pData, turn})); }
-    function oyunuYukle() {
-        let d = JSON.parse(localStorage.getItem('onikinciSancakKayit'));
-        numPlayers = d.numPlayers; playerNames = d.playerNames; pData = d.pData; turn = d.turn;
-        document.getElementById('setup-screen').style.display = 'none';
-        oyunuBaslat(false);
-    }
     function renderUI() {
-        document.getElementById('players-header').innerHTML = playerNames.map((n, i) => `<div id="p${i}-ui" class="player-info"><span style="color:${COLORS[i]}">●</span> ${n}: ${pData[i].done.length}/12</div>`).join('');
-        document.getElementById('status-board').innerHTML = playerNames.map((n, i) => `<div class="p-log"><span style="color:${COLORS[i]}">●</span> <b>${n}:</b> ${pData[i].done.join(', ') || 'Henüz sancak yok'}</div>`).join('');
+        document.getElementById('players-header').innerHTML = playerNames.map((n, i) => 
+            `<div id="p${i}-ui" class="player-info"><span style="color:${COLORS[i]}">●</span> ${n}: ${pData[i].done.length}/12</div>`).join('');
         
-        // Pinleri güncelle (Kim aldıysa onun rengi olsun)
         document.querySelectorAll('.pin').forEach(pin => {
             let cityName = pin.getAttribute('onclick').match(/'([^']+)'/)[1];
-            pin.classList.remove('done');
             pin.style.background = '#cc0000';
             pData.forEach((p, i) => {
                 if(p.done.includes(cityName)) {
-                    pin.classList.add('done');
                     pin.style.background = COLORS[i];
+                    pin.classList.add('done');
                 }
             });
         });
@@ -333,12 +333,10 @@
     }
     function showToast(m, c) {
         let t = document.getElementById('toast');
-        t.innerText = m; t.style.display = 'block'; t.style.borderColor = c ? '#2a9d8f' : '#e63946';
+        t.innerText = m; t.style.display = 'block';
         setTimeout(() => t.style.display = 'none', 2500);
     }
-    
     renderInputs();
-    if(localStorage.getItem('onikinciSancakKayit')) document.getElementById('resume-box').style.display = 'block';
 </script>
 </body>
 </html>
