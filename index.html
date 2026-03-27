@@ -314,9 +314,6 @@
     function renderUI() {
         document.getElementById('players-header').innerHTML = playerNames.map((n, i) => `<div id="p${i}-ui" class="player-info"><span style="color:${COLORS[i]}">●</span> ${n}: ${pData[i].done.length}/12</div>`).join('');
         document.getElementById('status-board').innerHTML = playerNames.map((n, i) => `<div class="p-log"><span style="color:${COLORS[i]}">●</span> <b>${n}:</b> ${pData[i].done.join(', ') || 'Henüz sancak yok'}</div>`).join('');
-        
-        //
-        });
     }
     function turnGuncelle() {
         document.getElementById('turn-name').innerText = playerNames[turn];
