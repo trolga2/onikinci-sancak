@@ -263,7 +263,6 @@
     function hamleYap(city) {
         let p = pData[turn];
         if (p.mustGo && p.mustGo !== city) return showToast("Önce " + p.mustGo + " hedefini tamamla!");
-        if (p.done.includes(city)) return showToast("Bu şehir zaten kurtarıldı.");
 
         let q = allQuestions[city][p.qIndex[city] % 7];
         document.getElementById('m-city').innerText = city + " Harekâtı";
